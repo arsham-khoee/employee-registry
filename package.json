@@ -2,9 +2,9 @@
   "name": "employee-registry",
   "version": "1.0.0",
   "description": "Simple employee management service",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "babel-node index.js",
+    "start": "babel-node app.js",
     "dev": "nodemon --exec npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
