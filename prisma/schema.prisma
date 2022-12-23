@@ -37,16 +37,16 @@ model Department {
 }
 
 model ChangesHistory {
-    id                   String     @id @default(auto()) @map("_id") @db.ObjectId
-    changedAt            DateTime   @default(now())
-    assignor             Employee   @relation(name: "AssignorEmployee", fields: [assignorId], references: [id])
-    assignorId           String     @db.ObjectId
-    assignee             Employee   @relation(name: "AssigneeEmployee", fields: [assigneeId], references: [id])
-    assigneeId           String     @db.ObjectId
-    previousDepartment   Department @relation(name: "PreviousDepartment", fields: [previousDepartmentId], references: [id])
-    previousDepartmentId String     @db.ObjectId
-    currentDepartment    Department @relation(name: "CurrentDepartment", fields: [currentDepartmentId], references: [id])
-    currentDepartmentId  String     @db.ObjectId
+    id                   String      @id @default(auto()) @map("_id") @db.ObjectId
+    changedAt            DateTime    @default(now())
+    assignor             Employee    @relation(name: "AssignorEmployee", fields: [assignorId], references: [id])
+    assignorId           String      @db.ObjectId
+    assignee             Employee    @relation(name: "AssigneeEmployee", fields: [assigneeId], references: [id])
+    assigneeId           String      @db.ObjectId
+    previousDepartment   Department? @relation(name: "PreviousDepartment", fields: [previousDepartmentId], references: [id])
+    previousDepartmentId String?     @db.ObjectId
+    currentDepartment    Department? @relation(name: "CurrentDepartment", fields: [currentDepartmentId], references: [id])
+    currentDepartmentId  String?     @db.ObjectId
 }
 
 enum Role {
