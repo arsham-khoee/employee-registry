@@ -1,10 +1,9 @@
 import bodyParser from 'body-parser'
 import express, { request } from 'express'
-import { PrismaClient } from '@prisma/client'
+import prisma from './prisma'
 import { AppRoutes } from './routes'
 import auth from './middleware/auth'
 
-const prisma = new PrismaClient()
 const app = express()
 app.use(bodyParser.json())
 
