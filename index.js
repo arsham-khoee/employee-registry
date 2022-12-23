@@ -16,7 +16,7 @@ main()
     process.exit(1)
 })
   
-console.log(`Prisma ${prisma._clientVersion} is connected.`)
+console.log(`Prisma ${prisma._clientVersion}`)
 
 AppRoutes.forEach(route => {
     const controller = (request, response, next) => {
