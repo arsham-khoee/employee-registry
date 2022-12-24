@@ -20,18 +20,18 @@ main()
   
 console.log(`PRISMA ${prisma._clientVersion}`)
 
-// AppRoutes.forEach(route => {
-//     const controller = (request, response, next) => {
-//         route.action(request, response)
-//             .then(() => next)
-//             .catch(err => next(err))
-//     }
-//     let args = [route.path, auth, controller]
-//     if(!route.auth) {
-//         args.splice(1, 1)
-//     }
-//     app[route.method](...args)
-// })
+AppRoutes.forEach(route => {
+    const controller = (request, response, next) => {
+        route.action(request, response)
+            .then(() => next)
+            .catch(err => next(err))
+    }
+    let args = [route.path, auth, controller]
+    if(!route.auth) {
+        args.splice(1, 1)
+    }
+    app[route.method](...args)
+})
 
 app.listen(config.PORT, config.HOST, () => {
     console.log(`APP LISTENING ON: http://${config.HOST}:${config.PORT}`);
