@@ -1,18 +1,18 @@
-import { SignupAction, LoginAction, employeesGetAllAction, employeePostAction, employeesGetByIdAction, employeeGetChangesHistoryAction, employeeUpdateAction, employeeDeleteAction } from './controller/employee'
-import { departmentPostAction, departmentsGetAllAction, } from './controller/department'
+import { signupAction, loginAction, employeesGetAllAction, employeePostAction, employeeGetByIdAction, employeeGetChangesHistoryAction, employeeUpdateAction, employeeDeleteAction } from './controller/employee'
+import { departmentPostAction, departmentsGetAllAction, departmentGetByIdAction, departmentUpdateAction, departmentDeleteAction } from './controller/department'
 
 export const AppRoutes = [
     {
         path: "/signup",
         method: "patch",
         auth: false,
-        action: SignupAction
+        action: signupAction
     },
     {
         path: '/login',
         method: 'post',
         auth: false,
-        action: LoginAction
+        action: loginAction
     },
     {
         path: '/employees',
@@ -30,7 +30,7 @@ export const AppRoutes = [
         path: '/employees/:id',
         method: 'get',
         auth: true,
-        action: employeesGetByIdAction
+        action: employeeGetByIdAction
     },
     {
         path: '/employees/:id/changes',
@@ -66,24 +66,18 @@ export const AppRoutes = [
         path: '/departments/:id',
         method: 'get',
         auth: true,
-        action: userSignupAction
-    },
-    {
-        path: '/departments/:id/changes',
-        method: 'get',
-        auth: true,
-        action: userSignupAction
+        action: departmentGetByIdAction
     },
     {
         path: '/departments/:id',
         method: 'patch',
         auth: true,
-        action: userSignupAction
+        action: departmentUpdateAction
     },
     {
         path: '/departments/:id',
         method: 'delete',
         auth: true,
-        action: userSignupAction
+        action: departmentDeleteAction
     },
 ]
