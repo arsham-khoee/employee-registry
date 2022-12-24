@@ -74,7 +74,22 @@ export async function employeesGetAllAction(req, res) {
             res.status(400).json({ message: 'no employees found' })
         }
         const employees = await prisma.employee.findMany({})
-        res.status(200).json( employees )
+        res.status(200).json(employees)
+    } catch(e) {
+        res.status(500).json({ message: e.message })
+    }
+}
+
+export async function employeePostAction(req, res) {
+    try {
+        if(req.user.role !== "ADMIN"){
+            return res.status(401).json({ message: 'no permission' })
+        }
+        const prisma = new PrismaClient()
+        const user = await prisma.employee.create({
+            data: req.body
+        })
+        res.status(201).json(user)
     } catch(e) {
         res.status(500).json({ message: e.message })
     }

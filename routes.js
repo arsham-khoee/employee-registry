@@ -1,4 +1,4 @@
-import { SignupAction, LoginAction, employeesGetAllAction } from "./controller/employee"
+import { SignupAction, LoginAction, employeesGetAllAction, employeePostAction } from "./controller/employee"
 
 export const AppRoutes = [
     {
@@ -23,7 +23,7 @@ export const AppRoutes = [
         path: '/employees',
         method: 'post',
         auth: true,
-        action: userSignupAction
+        action: employeePostAction
     },
     {
         path: '/employees/:id',
