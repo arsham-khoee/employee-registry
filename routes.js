@@ -32,6 +32,12 @@ export const AppRoutes = [
         action: userSignupAction
     },
     {
+        path: '/employees/:id/changes',
+        method: 'get',
+        auth: true,
+        action: userSignupAction
+    },
+    {
         path: '/employees/:id',
         method: 'patch',
         auth: true,
@@ -51,6 +57,12 @@ export const AppRoutes = [
     },
     {
         path: '/departments/:id',
+        method: 'get',
+        auth: true,
+        action: userSignupAction
+    },
+    {
+        path: '/departments/:id/changes',
         method: 'get',
         auth: true,
         action: userSignupAction
