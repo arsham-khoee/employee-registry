@@ -82,7 +82,7 @@ export async function employeesGetAllAction(req, res) {
 export async function employeePostAction(req, res) {
     try {
         if(req.user.role !== "ADMIN"){
-            return res.status(401).json({ message: 'no permission' })
+            return res.status(403).json({ message: 'no permission' })
         }
         const prisma = new PrismaClient()
         const user = await prisma.employee.create({
@@ -129,7 +129,7 @@ export async function employeeGetChangesHistoryAction(req, res) {
         }
         // TODO: check if it is needed to check permissions
         // if(req.user.id !== req.params.id) {
-        //     return res.status(401).json({ message: 'no permission' })
+        //     return res.status(403).json({ message: 'no permission' })
         // }
         const changesHistory = await prisma.changesHistory.findMany({
             where: {
@@ -239,7 +239,7 @@ export async function employeeDeleteAction(req, res) {
             res.status(404).json({ message: 'no such employee found' })
         }
         if(req.user.role !== "ADMIN") {
-            return res.status(401).json({ message: 'no permission' })
+            return res.status(403).json({ message: 'no permission' })
         }
         const user = await prisma.employee.delete({
             where: {
@@ -251,4 +251,3 @@ export async function employeeDeleteAction(req, res) {
         res.status(500).json({ message: e.message })
     }
 }
-

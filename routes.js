@@ -51,6 +51,12 @@ export const AppRoutes = [
     },
     {
         path: '/departments',
+        method: 'post',
+        auth: true,
+        action: departmentPostAction
+    },
+    {
+        path: '/departments',
         method: 'get',
         auth: true,
         action: userSignupAction
@@ -64,12 +70,6 @@ export const AppRoutes = [
     {
         path: '/departments/:id/changes',
         method: 'get',
-        auth: true,
-        action: userSignupAction
-    },
-    {
-        path: '/departments',
-        method: 'post',
         auth: true,
         action: userSignupAction
     },
