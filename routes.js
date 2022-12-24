@@ -1,4 +1,4 @@
-import { SignupAction, LoginAction, employeesGetAllAction, employeePostAction, employeesGetByIdAction, employeeGetChangesHistoryAction, employeeUpdateAction } from "./controller/employee"
+import { SignupAction, LoginAction, employeesGetAllAction, employeePostAction, employeesGetByIdAction, employeeGetChangesHistoryAction, employeeUpdateAction, employeeDeleteAction } from "./controller/employee"
 
 export const AppRoutes = [
     {
@@ -47,7 +47,7 @@ export const AppRoutes = [
         path: '/employees/:id',
         method: 'delete',
         auth: true,
-        action: userSignupAction
+        action: employeeDeleteAction
     },
     {
         path: '/departments',

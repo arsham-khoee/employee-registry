@@ -142,7 +142,6 @@ export async function employeeGetChangesHistoryAction(req, res) {
     }
 }
 
-
 export async function employeeUpdateAction(req, res) {
     try {
         const prisma = new PrismaClient()
@@ -225,6 +224,31 @@ export async function employeeUpdateAction(req, res) {
 
     } catch (e) {
         res.status(500).json({ error: e.message })
+    }
+}
+
+export async function employeeDeleteAction(req, res) {
+    try {
+        const prisma = new PrismaClient()
+        const employee = await prisma.employee.findUnique({
+            where: {
+                id: req.params.id
+            }
+        })
+        if(!employee) {
+            res.status(404).json({ message: 'no such employee found' })
+        }
+        if(req.user.role !== "ADMIN") {
+            return res.status(401).json({ message: 'no permission' })
+        }
+        const user = await prisma.employee.delete({
+            where: {
+                id: req.params.id
+            }
+        })
+        res.status(200).json(user)
+    } catch(e) {
+        res.status(500).json({ message: e.message })
     }
 }
 
