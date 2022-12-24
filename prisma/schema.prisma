@@ -16,7 +16,7 @@ model Employee {
     email                 String           @unique
     firstName             String
     lastName              String
-    password              String
+    password              String?
     address               String
     role                  Role             @default(USER)
     jobTitle              String?
