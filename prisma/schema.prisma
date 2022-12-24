@@ -17,9 +17,9 @@ model Employee {
     firstName             String
     lastName              String
     password              String?
-    address               String
+    address               String?
     role                  Role             @default(USER)
-    jobTitle              String?
+    jobTitle              String
     department            Department?      @relation(fields: [departmentId], references: [id])
     departmentId          String?          @db.ObjectId
     assignedOthersHistory ChangesHistory[] @relation(name: "AssignorEmployee")
