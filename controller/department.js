@@ -17,3 +17,21 @@ export async function departmentPostAction(req, res) {
         res.status(500).json({ message: e.message })
     }
 }
+
+export async function departmentsGetAllAction(req, res) {
+    try {
+        const prisma = new PrismaClient()
+        const user = await prisma.department.findFirst({
+            where: {
+                id: req.user.id
+            }
+        })
+        if(!user) {
+            res.status(404).json({ message: 'no employee found' })
+        }
+        const departments = await prisma.department.findMany({})
+        res.status(200).json(departments)
+    } catch(e) {
+        res.status(500).json(e.message)
+    }
+}

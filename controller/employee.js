@@ -18,8 +18,7 @@ export async function SignupAction(req, res) {
         if(!validatePassword(req.body.password)) {
             return res.status(400).json({ message: 'invalid password' })
         }
-
-        const user = await prisma.employee.findFirst({
+        const user = await prisma.employee.findUnique({
             where: {
                 email: req.body.email
             }
@@ -97,19 +96,14 @@ export async function employeePostAction(req, res) {
 export async function employeesGetByIdAction(req, res) {
     try{
         const prisma = new PrismaClient()
-        const user = await prisma.employee.findFirst({
-            where: {
-                id: req.user.id
-            }
-        })
-        if(!user) {
-            res.status(404).json({ message: 'no employee found' })
-        }
         const employee = await prisma.employee.findUnique({
             where: {
                 id: req.params.id
             }
         })
+        if(!employee) {
+            res.status(404).json({ message: 'no employee found' })
+        }
         res.status(200).json(employee)
     } catch(e) {
         res.status(500).json({ message: e.message })
