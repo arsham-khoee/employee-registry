@@ -21,10 +21,10 @@ const auth = async (req, res, next) => {
             } 
             req.user = user
             req.token = token
-            console.log('auth successful')
+            console.log('authentication successful')
             next()
         } catch(e) {
-            res.status(401).send(e.message)
+            res.status(401).json({ message: 'authentication failed' })
         }
 }
 

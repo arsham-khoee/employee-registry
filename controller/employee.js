@@ -61,3 +61,21 @@ export async function LoginAction(req, res) {
         res.status(500).json({ message: e.message })
     }
 }
+
+export async function employeesGetAllAction(req, res) {
+    try{
+        const prisma = new PrismaClient()
+        const user = await prisma.employee.findFirst({
+            where: {
+                id: req.user.id
+            }
+        })
+        if(!user) {
+            res.status(400).json({ message: 'no employees found' })
+        }
+        const employees = await prisma.employee.findMany({})
+        res.status(200).json( employees )
+    } catch(e) {
+        res.status(500).json({ message: e.message })
+    }
+}
