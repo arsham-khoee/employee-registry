@@ -1,11 +1,11 @@
-
+import { SignupAction } from "./controller/employee"
 
 export const AppRoutes = [
     {
         path: "/signup",
-        method: "post",
+        method: "patch",
         auth: false,
-        action: userSignupAction
+        action: SignupAction
     },
     {
         path: '/login',
