@@ -11,7 +11,7 @@ export const AppRoutes = [
         path: '/login',
         method: 'post',
         auth: false,
-        action: userSignupAction
+        action: LoginAction
     },
     {
         path: '/employees',

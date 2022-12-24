@@ -11,16 +11,13 @@ export async function SignupAction(req, res) {
         const allowedUpdates = ['email', 'password']
         const isValidOperation = allowedUpdates.every((update) => updates.includes(update))
         if(!isValidOperation){
-            res.status(400).send('email and password are required')
-            return
+            return res.status(400).json({ message: 'email and password are required' })
         }
         if(!validateEmail(req.body.email)) {
-            res.status(400).send('invalid email')
-            return 
+            return res.status(400).json({ message: 'invalid email' })
         }
         if(!validatePassword(req.body.password)) {
-            res.status(400).send('invalid password')
-            return 
+            return res.status(400).json({ message: 'invalid password' })
         }
 
         const user = await prisma.employee.findFirst({
@@ -40,9 +37,27 @@ export async function SignupAction(req, res) {
             const token = await generateToken(user.id)
             return res.status(200).send({updatedUser, token})
         } else {
-            res.status(400).send('registering is not allowed')
+            res.status(400).json({ message: 'registering is not allowed' })
         }
     } catch(e) {
-        res.status(500).send()
+        res.status(500).json({ message: e.message })
+    }
+}
+
+export async function LoginAction(req, res) {
+    try{
+        const prisma = new PrismaClient()
+        const user = await prisma.employee.findUnique({
+            where: {
+                email: req.body.email
+            }
+        })
+        if(!user || user.password !== req.body.password) {
+            res.status(400).json({ message: 'invalid email or password' })
+        }
+        const token = await generateToken(user.id)
+        res.status(200).json({ user, token })
+    } catch(e) {
+        res.status(500).json({ message: e.message })
     }
 }
