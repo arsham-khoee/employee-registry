@@ -6,7 +6,6 @@ import validatePassword from '../utils/validatePassword'
 export async function SignupAction(req, res) {
     try {
         const prisma = new PrismaClient()
-
         const updates = Object.keys(req.body)
         const allowedUpdates = ['email', 'password']
         const isValidOperation = allowedUpdates.every((update) => updates.includes(update))
@@ -71,7 +70,7 @@ export async function employeesGetAllAction(req, res) {
             }
         })
         if(!user) {
-            res.status(400).json({ message: 'no employee found' })
+            res.status(404).json({ message: 'no employee found' })
         }
         const employees = await prisma.employee.findMany({})
         res.status(200).json(employees)
@@ -104,7 +103,7 @@ export async function employeesGetByIdAction(req, res) {
             }
         })
         if(!user) {
-            res.status(400).json({ message: 'no employee found' })
+            res.status(404).json({ message: 'no employee found' })
         }
         const employee = await prisma.employee.findUnique({
             where: {
@@ -120,10 +119,18 @@ export async function employeesGetByIdAction(req, res) {
 export async function employeeGetChangesHistoryAction(req, res) {
     try {
         const prisma = new PrismaClient()
-        //TODO: check if it is needed to check permissions
-        if(req.user.id !== req.params.id) {
-            return res.status(401).json({ message: 'no permission' })
+        const assignee = await prisma.employee.findUnique({
+            where: {
+                id: req.params.id
+            }
+        })
+        if(!assignee) {
+            res.status(404).json({ message: 'no such assignee found' })
         }
+        // TODO: check if it is needed to check permissions
+        // if(req.user.id !== req.params.id) {
+        //     return res.status(401).json({ message: 'no permission' })
+        // }
         const changesHistory = await prisma.changesHistory.findMany({
             where: {
                 assigneeId: req.params.id
@@ -134,3 +141,90 @@ export async function employeeGetChangesHistoryAction(req, res) {
         res.status(500).json({ message: e.message })
     }
 }
+
+
+export async function employeeUpdateAction(req, res) {
+    try {
+        const prisma = new PrismaClient()
+        const employee = await prisma.employee.findUnique({
+            where: {
+                id: req.params.id
+            }
+        })
+        if(!employee) {
+            res.status(404).json({ message: 'no such employee found' })
+        }
+        const updates = Object.keys(req.body)
+        let isValidOperation
+        if(req.user.id === req.params.id) {
+            const allowedUpdates = ['email', 'password', 'firstName', 'lastName', 'address']
+            isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+        }
+        if(req.user.role === "ADMIN") {
+            const allowedUpdates = ['email', 'password', 'firstName', 'lastName', 'address', 'jobTitle', 'departmentId', 'role']
+            isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+            if(updates.includes('departmentId')) {
+                console.log(req.user)
+                // decrease the previous department employeeCount
+                if(req.user.departmentId !== null) {
+                    const previousDepartment = await prisma.department.findUnique({
+                        where: {
+                            id: req.user.departmentId
+                        }
+                    })
+                    console.log(previousDepartment)
+                    const updatedPreviousDepartment = await prisma.department.update({
+                        where: {
+                            id: req.user.departmentId
+                        },
+                        data: {
+                            employeeCount: previousDepartment.employeeCount - 1
+                        }
+                    })
+                }
+                // increase the current department employeeCount
+                if(req.body.departmentId !== "null") {
+                    const currentDepartment = await prisma.department.findUnique({
+                        where: {
+                            id: req.body.departmentId
+                        }
+                    })
+                    console.log(currentDepartment)
+                    const updatedCurrentDepartment = await prisma.department.update({
+                        where: {
+                            id: req.body.departmentId
+                        },
+                        data: {
+                            employeeCount: currentDepartment.employeeCount + 1
+                        }
+                    })
+                }
+                if(req.body.departmentId === "null") {
+                    req.body.departmentId = null
+                }
+                const changesHistory = await prisma.changesHistory.create({
+                    data: {
+                        assignorId: req.user.id,
+                        assigneeId: req.params.id,
+                        previousDepartmentId: req.user.departmentId,
+                        currentDepartmentId: req.body.departmentId
+                    }
+                })
+            }
+        }
+        if(!isValidOperation){
+            return res.status(400).json({ message: 'invalid update request' })
+        }
+        const updatedUser = await prisma.employee.update({
+            where: {
+                id: req.params.id
+            },
+            data: req.body
+        })
+        res.status(200).json(updatedUser)
+
+    } catch (e) {
+        res.status(500).json({ error: e.message })
+    }
+}
+
