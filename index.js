@@ -1,3 +1,5 @@
+
+import config from './config.js'
 import { prisma } from './prisma'
 import { app } from './app'
 import { AppRoutes } from './routes'
@@ -16,19 +18,21 @@ main()
     process.exit(1)
 })
   
-console.log(`Prisma ${prisma._clientVersion}`)
+console.log(`PRISMA ${prisma._clientVersion}`)
 
-AppRoutes.forEach(route => {
-    const controller = (request, response, next) => {
-        route.action(request, response)
-            .then(() => next)
-            .catch(err => next(err))
-    }
-    let args = [route.path, auth, controller]
-    if(!route.auth) {
-        args.splice(1, 1)
-    }
-    app[route.method](...args)
+// AppRoutes.forEach(route => {
+//     const controller = (request, response, next) => {
+//         route.action(request, response)
+//             .then(() => next)
+//             .catch(err => next(err))
+//     }
+//     let args = [route.path, auth, controller]
+//     if(!route.auth) {
+//         args.splice(1, 1)
+//     }
+//     app[route.method](...args)
+// })
+
+app.listen(config.PORT, config.HOST, () => {
+    console.log(`APP LISTENING ON: http://${config.HOST}:${config.PORT}`);
 })
-
-app.listen(3000, () => console.log('Server is running on port 3000'))
