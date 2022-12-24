@@ -71,7 +71,7 @@ export async function employeesGetAllAction(req, res) {
             }
         })
         if(!user) {
-            res.status(400).json({ message: 'no employees found' })
+            res.status(400).json({ message: 'no employee found' })
         }
         const employees = await prisma.employee.findMany({})
         res.status(200).json(employees)
@@ -90,6 +90,46 @@ export async function employeePostAction(req, res) {
             data: req.body
         })
         res.status(201).json(user)
+    } catch(e) {
+        res.status(500).json({ message: e.message })
+    }
+}
+
+export async function employeesGetByIdAction(req, res) {
+    try{
+        const prisma = new PrismaClient()
+        const user = await prisma.employee.findFirst({
+            where: {
+                id: req.user.id
+            }
+        })
+        if(!user) {
+            res.status(400).json({ message: 'no employee found' })
+        }
+        const employee = await prisma.employee.findUnique({
+            where: {
+                id: req.params.id
+            }
+        })
+        res.status(200).json(employee)
+    } catch(e) {
+        res.status(500).json({ message: e.message })
+    }
+}
+
+export async function employeeGetChangesHistoryAction(req, res) {
+    try {
+        const prisma = new PrismaClient()
+        //TODO: check if it is needed to check permissions
+        if(req.user.id !== req.params.id) {
+            return res.status(401).json({ message: 'no permission' })
+        }
+        const changesHistory = await prisma.changesHistory.findMany({
+            where: {
+                assigneeId: req.params.id
+            }
+        })
+        res.status(200).json(changesHistory)
     } catch(e) {
         res.status(500).json({ message: e.message })
     }
