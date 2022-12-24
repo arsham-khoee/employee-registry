@@ -1,9 +1,11 @@
 
 import config from './config.js'
-import { prisma } from './prisma'
 import { app } from './app'
 import { AppRoutes } from './routes'
 import { auth } from './middleware/auth'
+import { PrismaClient } from '@prisma/client'
+ 
+export const prisma = new PrismaClient()
 
 async function main() {
     await prisma.$connect()
