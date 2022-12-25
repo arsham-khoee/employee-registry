@@ -33,7 +33,7 @@ export const AppRoutes = [
         action: employeeGetByIdAction
     },
     {
-        path: '/employees/department/:id',
+        path: '/api/employees/department/:id',
         method: 'get',
         auth: true,
         action: employeesGetByDepartmentId
