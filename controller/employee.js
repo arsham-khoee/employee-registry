@@ -35,6 +35,7 @@ export async function signupAction(req, res) {
                     password
                 }
             })
+            delete updatedUser['password']
             const token = await generateToken(user.id)
             return res.status(200).send({updatedUser, token})
         } else {
@@ -56,6 +57,7 @@ export async function loginAction(req, res) {
         if(!user || !isMatch) {
             res.status(400).json({ message: 'invalid email or password' })
         }
+        delete user['password']
         const token = await generateToken(user.id)
         res.status(200).json({ user, token })
     } catch(e) {
@@ -105,6 +107,7 @@ export async function employeesGetAllAction(req, res) {
         if(employees.length == 0){
            return res.status(404).json({ message: 'no employee found' })
         }
+        employees.forEach(employee => delete employee['password'])
         res.status(200).json(employees)
     } catch(e) {
         res.status(500).json({ message: e.message })
@@ -149,7 +152,7 @@ export async function employeePostAction(req, res) {
                 })
             }
         })
-        res.status(201).json(user)
+        res.status(201).json()
     } catch(e) {
         res.status(500).json({ message: e.message })
     }
@@ -168,6 +171,7 @@ export async function employeeGetByIdAction(req, res) {
         if(!employee) {
            return res.status(404).json({ message: 'no employee found' })
         }
+        delete employee['password']
         res.status(200).json(employee)
     } catch(e) {
         res.status(500).json({ message: e.message })
@@ -279,6 +283,7 @@ export async function employeeUpdateAction(req, res) {
             },
             data: req.body
         })
+        delete updatedUser['password']
         res.status(200).json(updatedUser)
 
     } catch (e) {
@@ -304,6 +309,7 @@ export async function employeeDeleteAction(req, res) {
                 id: req.params.id
             }
         })
+        delete deletedEmployee['password']
         res.status(200).json(deletedEmployee)
     } catch(e) {
         res.status(500).json({ message: e.message })
@@ -351,6 +357,7 @@ export async function employeesGetByDepartmentId(req, res) {
         if(employees.length === 0) {
            return res.status(404).json({ message: 'no employee found' })
         }
+        employees.forEach(employee => delete employee['password'])
         res.status(200).json(employees)
     } catch(e) {
         res.status(500).json({ message: e.message })

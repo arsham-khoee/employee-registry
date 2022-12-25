@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  loop-backend:
+    image: employee-registry:latest 
+    container_name: employee-registry
+    restart: always
+    ports:
+      - 3000:3000"

@@ -1,4 +1,4 @@
-import { signupAction, loginAction, employeesGetAllAction, employeePostAction, employeeGetByIdAction, employeeGetChangesHistoryAction, employeeUpdateAction, employeeDeleteAction } from './controller/employee'
+import { signupAction, loginAction, employeesGetAllAction, employeePostAction, employeeGetByIdAction, employeeGetChangesHistoryAction, employeeUpdateAction, employeeDeleteAction, employeesGetByDepartmentId } from './controller/employee'
 import { departmentPostAction, departmentsGetAllAction, departmentGetByIdAction, departmentUpdateAction, departmentDeleteAction } from './controller/department'
 
 export const AppRoutes = [
