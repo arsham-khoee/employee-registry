@@ -10,9 +10,6 @@ const auth = async (req, res, next) => {
             const user = await prisma.employee.findUnique({
                 where: {
                     id: decoded.userId
-                },
-                include: {
-                    department: true
                 }
             })
             console.log('user:', user)

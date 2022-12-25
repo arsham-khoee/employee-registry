@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import generateToken from '../utils/generateToken'
 import validateEmail from '../utils/validateEmail'
 import validatePassword from '../utils/validatePassword'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -19,6 +20,7 @@ export async function signupAction(req, res) {
         if(!validatePassword(req.body.password)) {
             return res.status(400).json({ message: 'invalid password' })
         }
+        const password = await bcrypt.hash(req.body.password, 10);
         const user = await prisma.employee.findUnique({
             where: {
                 email: req.body.email
@@ -30,7 +32,7 @@ export async function signupAction(req, res) {
                     id: user.id
                 },
                 data: {
-                    password: req.body.password
+                    password
                 }
             })
             const token = await generateToken(user.id)
@@ -50,7 +52,8 @@ export async function loginAction(req, res) {
                 email: req.body.email
             }
         })
-        if(!user || user.password !== req.body.password) {
+        const isMatch = await bcrypt.compare(args.data.password, user.password);
+        if(!user || !isMatch) {
             res.status(400).json({ message: 'invalid email or password' })
         }
         const token = await generateToken(user.id)
@@ -129,7 +132,7 @@ export async function employeeGetChangesHistoryAction(req, res) {
 
 export async function employeeUpdateAction(req, res) {
     try {
-        if(req.user.id !== req.params.id || req.user.role !== "ADMIN"){
+        if(req.user.id !== req.params.id && req.user.role !== "ADMIN"){
             return res.status(403).json({ message: 'no permission' })
         }
         const employee = await prisma.employee.findUnique({
