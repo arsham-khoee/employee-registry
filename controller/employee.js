@@ -65,7 +65,43 @@ export async function loginAction(req, res) {
 
 export async function employeesGetAllAction(req, res) {
     try{
-        const employees = await prisma.employee.findMany({})
+        let obj = {}
+        if(req.query.skip && req.query.take){
+            obj = {
+                skip: ~~req.query.skip, 
+                take: ~~req.query.take
+            }
+        } 
+        let searchObj = {}
+        if(req.query.searchText) {
+            searchObj = {
+                OR: [
+                    {
+                        firstName: {
+                            contains: req.query.searchText
+                        }
+                    },
+                    {   
+                        lastName: {
+                            contains: req.query.searchText
+                        }
+                    },
+                    {   
+                        email: {
+                            contains: req.query.searchText
+                        }
+                    }
+                ]
+            }
+            obj['where'] = searchObj
+        }
+        console.log(obj)
+        const employees = await prisma.employee.findMany({
+            ...obj,
+            include: {
+                department: true
+            }
+        })
         if(employees.length == 0){
            return res.status(404).json({ message: 'no employee found' })
         }
@@ -80,8 +116,38 @@ export async function employeePostAction(req, res) {
         if(req.user.role !== "ADMIN"){
             return res.status(403).json({ message: 'no permission' })
         }
-        const user = await prisma.employee.create({
-            data: req.body
+        req.body.forEach(async (obj) => {
+            const employee = await prisma.employee.create({
+                data: obj
+            })
+            const updates = Object.keys(obj)
+            if(updates.includes('departmentId')) {
+                console.log(req.user)
+                // increase the current department employeeCount
+                if(req.body.departmentId !== "null") {
+                    const currentDepartment = await prisma.department.findUnique({
+                        where: {
+                            id: obj.departmentId
+                        }
+                    })
+                    const updatedCurrentDepartment = await prisma.department.update({
+                        where: {
+                            id: obj.departmentId
+                        },
+                        data: {
+                            employeeCount: currentDepartment.employeeCount + 1
+                        }
+                    })
+                }
+                const changesHistory = await prisma.changesHistory.create({
+                    data: {
+                        assignorId: req.user.id,
+                        assigneeId: employee.id,
+                        previousDepartmentId: null,
+                        currentDepartmentId: obj.departmentId
+                    }
+                })
+            }
         })
         res.status(201).json(user)
     } catch(e) {
@@ -94,6 +160,9 @@ export async function employeeGetByIdAction(req, res) {
         const employee = await prisma.employee.findUnique({
             where: {
                 id: req.params.id
+            },
+            include: {
+                department: true
             }
         })
         if(!employee) {
@@ -155,16 +224,16 @@ export async function employeeUpdateAction(req, res) {
             if(updates.includes('departmentId')) {
                 console.log(req.user)
                 // decrease the previous department employeeCount
-                if(req.user.departmentId !== null) {
+                if(employee.departmentId !== null) {
                     const previousDepartment = await prisma.department.findUnique({
                         where: {
-                            id: req.user.departmentId
+                            id: employee['departmentId']
                         }
                     })
                     console.log(previousDepartment)
                     const updatedPreviousDepartment = await prisma.department.update({
                         where: {
-                            id: req.user.departmentId
+                            id: employee['departmentId']
                         },
                         data: {
                             employeeCount: previousDepartment.employeeCount - 1
@@ -195,7 +264,7 @@ export async function employeeUpdateAction(req, res) {
                     data: {
                         assignorId: req.user.id,
                         assigneeId: req.params.id,
-                        previousDepartmentId: req.user.departmentId,
+                        previousDepartmentId: employee.departmentId,
                         currentDepartmentId: req.body.departmentId
                     }
                 })
@@ -239,4 +308,51 @@ export async function employeeDeleteAction(req, res) {
     } catch(e) {
         res.status(500).json({ message: e.message })
     }
+}
+
+export async function employeesGetByDepartmentId(req, res) {
+    try{
+        let obj = {}
+        if(req.query.skip && req.query.take){
+            obj = {
+                skip: ~~req.query.skip, 
+                take: ~~req.query.take
+            }
+        } 
+        let whereSearchObj = {}
+        if(req.query.searchText) {
+            whereSearchObj = {
+                OR:[
+                    {
+                        firstName: {
+                            contains: req.query.searchText
+                        }
+                    },
+                    {   
+                        lastName: {
+                            contains: req.query.searchText
+                        }
+                    },
+                    {   
+                        email: {
+                            contains: req.query.searchText
+                        }
+                    }
+                ]
+            }
+        }
+        const employees = await prisma.employee.findMany({
+            ...obj,
+            where: {
+                ...whereSearchObj,
+                departmentId: req.params.id
+            }
+        })
+        if(employees.length === 0) {
+           return res.status(404).json({ message: 'no employee found' })
+        }
+        res.status(200).json(employees)
+    } catch(e) {
+        res.status(500).json({ message: e.message })
+    } 
 }

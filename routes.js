@@ -3,79 +3,85 @@ import { departmentPostAction, departmentsGetAllAction, departmentGetByIdAction,
 
 export const AppRoutes = [
     {
-        path: "/signup",
+        path: "/api/signup",
         method: "patch",
         auth: false,
         action: signupAction
     },
     {
-        path: '/login',
+        path: '/api/login',
         method: 'post',
         auth: false,
         action: loginAction
     },
     {
-        path: '/employees',
+        path: '/api/employees',
         method: 'get',
         auth: true,
         action: employeesGetAllAction
     },
     {
-        path: '/employees',
+        path: '/api/employees',
         method: 'post',
         auth: true,
         action: employeePostAction
     },
     {
-        path: '/employees/:id',
+        path: '/api/employees/:id',
         method: 'get',
         auth: true,
         action: employeeGetByIdAction
     },
     {
-        path: '/employees/:id/changes',
+        path: '/employees/department/:id',
+        method: 'get',
+        auth: true,
+        action: employeesGetByDepartmentId
+    },
+    {
+        path: '/api/employees/:id/changes',
         method: 'get',
         auth: true,
         action: employeeGetChangesHistoryAction
     },
     {
-        path: '/employees/:id',
+        path: '/api/employees/:id',
         method: 'patch',
         auth: true,
         action: employeeUpdateAction
     },
     {
-        path: '/employees/:id',
+        path: '/api/employees/:id',
         method: 'delete',
         auth: true,
         action: employeeDeleteAction
     },
     {
-        path: '/departments',
+        path: '/api/departments',
         method: 'post',
         auth: true,
         action: departmentPostAction
     },
     {
-        path: '/departments',
+        path: '/api/departments',
         method: 'get',
         auth: true,
         action: departmentsGetAllAction
     },
     {
-        path: '/departments/:id',
+        path: '/api/departments/:id',
         method: 'get',
         auth: true,
         action: departmentGetByIdAction
     },
     {
-        path: '/departments/:id',
+        path: '/api/departments/:id',
         method: 'patch',
         auth: true,
         action: departmentUpdateAction
     },
     {
-        path: '/departments/:id',
+        path: '/api/departments/:id',
         method: 'delete',
         auth: true,
         action: departmentDeleteAction
