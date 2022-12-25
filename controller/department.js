@@ -36,6 +36,9 @@ export async function departmentGetByIdAction(req, res) {
         const department = await prisma.department.findUnique({
             where: {
                 id: req.params.id
+            },
+            include: {
+                employee: true
             }
         })
         if(!department) {
