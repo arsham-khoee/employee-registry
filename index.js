@@ -2,7 +2,7 @@
 import config from './config.js'
 import { app } from './app'
 import { AppRoutes } from './routes'
-import { auth } from './middleware/auth'
+import auth from './middleware/auth'
 import { PrismaClient } from '@prisma/client'
  
 export const prisma = new PrismaClient()
