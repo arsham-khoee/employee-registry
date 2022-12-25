@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
+const prisma = new PrismaClient()
+
 export async function departmentPostAction(req, res) {
     try {
         if(req.user.role !== "ADMIN") {
@@ -8,7 +10,6 @@ export async function departmentPostAction(req, res) {
         if(!req.body.name) {
             return res.status(400).json('the required field is not provided')
         }
-        const prisma = new PrismaClient()
         const department = await prisma.department.create({
             data: req.body
         })
@@ -20,7 +21,6 @@ export async function departmentPostAction(req, res) {
 
 export async function departmentsGetAllAction(req, res) {
     try {
-        const prisma = new PrismaClient()
         const departments = await prisma.department.findMany({})
         if(departments.length == 0) {
            return res.status(404).json({ message: 'no department found' })
@@ -33,7 +33,6 @@ export async function departmentsGetAllAction(req, res) {
 
 export async function departmentGetByIdAction(req, res) {
     try {
-        const prisma = new PrismaClient()
         const department = await prisma.department.findUnique({
             where: {
                 id: req.params.id
@@ -53,7 +52,6 @@ export async function departmentUpdateAction(req, res) {
         if(req.user.role !== "ADMIN") {
             return res.status(403).json({ message: 'no permission' })
         }
-        const prisma = new PrismaClient()
         const department = await prisma.department.findUnique({
             where: {
                 id: req.params.id
@@ -85,7 +83,14 @@ export async function departmentDeleteAction(req, res) {
         if(req.user.role !== "ADMIN") {
             return res.status(403).json({ message: 'no permission' })
         }
-        const prisma = new PrismaClient()
+        const department = await prisma.department.findUnique({
+            where: {
+                id: req.params.id
+            }
+        })
+        if(!department) {
+            return res.status(404).json({ message: 'no such department found' })
+        }
         // remove departmentId from its employees
         const updatedUsers = await prisma.employee.updateMany({
             where: {
@@ -100,9 +105,6 @@ export async function departmentDeleteAction(req, res) {
                 id: req.params.id
             }
         })
-        if(!deletedDepartment) {
-            return res.status(404).json({ message: 'no such department found' })
-        }
         res.status(200).json(deletedDepartment) 
     } catch(e) {
         res.status(500).json({ message: e.message })

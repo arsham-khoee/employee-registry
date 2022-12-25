@@ -3,6 +3,8 @@ import generateToken from '../utils/generateToken'
 import validateEmail from '../utils/validateEmail'
 import validatePassword from '../utils/validatePassword'
 
+const prisma = new PrismaClient()
+
 export async function signupAction(req, res) {
     try {
         const updates = Object.keys(req.body)
@@ -17,7 +19,6 @@ export async function signupAction(req, res) {
         if(!validatePassword(req.body.password)) {
             return res.status(400).json({ message: 'invalid password' })
         }
-        const prisma = new PrismaClient()
         const user = await prisma.employee.findUnique({
             where: {
                 email: req.body.email
@@ -44,7 +45,6 @@ export async function signupAction(req, res) {
 
 export async function loginAction(req, res) {
     try{
-        const prisma = new PrismaClient()
         const user = await prisma.employee.findUnique({
             where: {
                 email: req.body.email
@@ -62,7 +62,6 @@ export async function loginAction(req, res) {
 
 export async function employeesGetAllAction(req, res) {
     try{
-        const prisma = new PrismaClient()
         const employees = await prisma.employee.findMany({})
         if(employees.length == 0){
            return res.status(404).json({ message: 'no employee found' })
@@ -78,7 +77,6 @@ export async function employeePostAction(req, res) {
         if(req.user.role !== "ADMIN"){
             return res.status(403).json({ message: 'no permission' })
         }
-        const prisma = new PrismaClient()
         const user = await prisma.employee.create({
             data: req.body
         })
@@ -90,7 +88,6 @@ export async function employeePostAction(req, res) {
 
 export async function employeeGetByIdAction(req, res) {
     try{
-        const prisma = new PrismaClient()
         const employee = await prisma.employee.findUnique({
             where: {
                 id: req.params.id
@@ -111,7 +108,6 @@ export async function employeeGetChangesHistoryAction(req, res) {
         // if(req.user.id !== req.params.id) {
         //     return res.status(403).json({ message: 'no permission' })
         // }
-        const prisma = new PrismaClient()
         const assignee = await prisma.employee.findUnique({
             where: {
                 id: req.params.id
@@ -136,7 +132,6 @@ export async function employeeUpdateAction(req, res) {
         if(req.user.id !== req.params.id || req.user.role !== "ADMIN"){
             return res.status(403).json({ message: 'no permission' })
         }
-        const prisma = new PrismaClient()
         const employee = await prisma.employee.findUnique({
             where: {
                 id: req.params.id
@@ -224,15 +219,19 @@ export async function employeeDeleteAction(req, res) {
         if(req.user.role !== "ADMIN") {
             return res.status(403).json({ message: 'no permission' })
         }
-        const prisma = new PrismaClient()
+        const employee = await prisma.employee.findUnique({
+            where: {
+                id: req.params.id
+            }
+        })  
+        if(!employee) {
+            return res.status(404).json({ message: 'no such employee found' })
+        }
         const deletedEmployee = await prisma.employee.delete({
             where: {
                 id: req.params.id
             }
         })
-        if(!deletedEmployee) {
-            return res.status(404).json({ message: 'no such employee found' })
-        }
         res.status(200).json(deletedEmployee)
     } catch(e) {
         res.status(500).json({ message: e.message })
