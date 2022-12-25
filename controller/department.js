@@ -21,7 +21,29 @@ export async function departmentPostAction(req, res) {
 
 export async function departmentsGetAllAction(req, res) {
     try {
-        const departments = await prisma.department.findMany({})
+        let obj = {}
+        if(req.query.skip && req.query.take){
+            obj = {
+                skip: ~~req.query.skip, 
+                take: ~~req.query.take
+            }
+        } 
+        let searchObj = {}
+        if(req.query.searchText) {
+            searchObj = {
+                OR: [
+                    {
+                        name: {
+                            contains: req.query.searchText
+                        }
+                    }
+                ]
+            }
+            obj['where'] = searchObj
+        }
+        const departments = await prisma.department.findMany({
+            ...obj
+        })
         if(departments.length == 0) {
            return res.status(404).json({ message: 'no department found' })
         }
