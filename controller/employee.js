@@ -236,10 +236,16 @@ export async function employeeUpdateAction(req, res) {
         if(req.user.id === req.params.id) {
             const allowedUpdates = ['email', 'password', 'firstName', 'lastName', 'address']
             isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+            if(!isValidOperation){
+                return res.status(400).json({ message: 'invalid update request' })
+            }
         }
         if(req.user.role === "ADMIN") {
             const allowedUpdates = ['email', 'password', 'firstName', 'lastName', 'address', 'jobTitle', 'departmentId', 'role']
             isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+            if(!isValidOperation){
+                return res.status(400).json({ message: 'invalid update request' })
+            }
             if(updates.includes('departmentId')) {
                 console.log(req.user)
                 if(String(employee.departmentId) !== req.body.departmentId){
@@ -290,9 +296,6 @@ export async function employeeUpdateAction(req, res) {
                     })
                 }
             }
-        }
-        if(!isValidOperation){
-            return res.status(400).json({ message: 'invalid update request' })
         }
         const updatedUser = await prisma.employee.update({
             where: {
