@@ -152,7 +152,7 @@ export async function employeePostAction(req, res) {
                 })
             }
         })
-        res.status(201).json()
+        res.status(201).json(employee)
     } catch(e) {
         res.status(500).json({ message: e.message })
     }
