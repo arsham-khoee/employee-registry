@@ -1,4 +1,4 @@
-FROM node:18.12.1
+FROM node:18.9.1
 
 RUN mkdir -p /usr/src/employee-registry/node_modules
 
@@ -16,6 +16,6 @@ RUN npx prisma db pull
 
 RUN npx prisma generate
 
-#RUN npx prisma db push
+RUN npx prisma db push
 
 CMD [ "yarn", "start" ]

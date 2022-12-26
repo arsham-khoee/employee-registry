@@ -242,51 +242,53 @@ export async function employeeUpdateAction(req, res) {
             isValidOperation = updates.every((update) => allowedUpdates.includes(update))
             if(updates.includes('departmentId')) {
                 console.log(req.user)
-                // decrease the previous department employeeCount
-                if(employee.departmentId !== null) {
-                    const previousDepartment = await prisma.department.findUnique({
-                        where: {
-                            id: employee['departmentId']
-                        }
-                    })
-                    console.log(previousDepartment)
-                    const updatedPreviousDepartment = await prisma.department.update({
-                        where: {
-                            id: employee['departmentId']
-                        },
-                        data: {
-                            employeeCount: previousDepartment.employeeCount - 1
-                        }
-                    })
-                }
-                // increase the current department employeeCount
-                if(req.body.departmentId !== "null") {
-                    const currentDepartment = await prisma.department.findUnique({
-                        where: {
-                            id: req.body.departmentId
-                        }
-                    })
-                    console.log(currentDepartment)
-                    const updatedCurrentDepartment = await prisma.department.update({
-                        where: {
-                            id: req.body.departmentId
-                        },
-                        data: {
-                            employeeCount: currentDepartment.employeeCount + 1
-                        }
-                    })
-                }
-                if(req.body.departmentId === "null") {
-                    req.body.departmentId = null
-                }
-                const changesHistory = await prisma.changesHistory.create({
-                    data: {
-                        assignorId: req.user.id,
-                        assigneeId: req.params.id,
-                        previousDepartmentId: employee.departmentId,
-                        currentDepartmentId: req.body.departmentId
+                if(String(employee.departmentId) !== req.body.departmentId){
+                    // decrease the previous department employeeCount
+                    if(employee.departmentId !== null) {
+                        const previousDepartment = await prisma.department.findUnique({
+                            where: {
+                                id: employee['departmentId']
+                            }
+                        })
+                        console.log(previousDepartment)
+                        const updatedPreviousDepartment = await prisma.department.update({
+                            where: {
+                                id: employee['departmentId']
+                            },
+                            data: {
+                                employeeCount: previousDepartment.employeeCount - 1
+                            }
+                        })
                     }
-                })
+                    // increase the current department employeeCount
+                    if(req.body.departmentId !== "null") {
+                        const currentDepartment = await prisma.department.findUnique({
+                            where: {
+                                id: req.body.departmentId
+                            }
+                        })
+                        console.log(currentDepartment)
+                        const updatedCurrentDepartment = await prisma.department.update({
+                            where: {
+                                id: req.body.departmentId
+                            },
+                            data: {
+                                employeeCount: currentDepartment.employeeCount + 1
+                            }
+                        })
+                    }
+                    if(req.body.departmentId === "null") {
+                        req.body.departmentId = null
+                    }
+                    const changesHistory = await prisma.changesHistory.create({
+                        data: {
+                            assignorId: req.user.id,
+                            assigneeId: req.params.id,
+                            previousDepartmentId: employee.departmentId,
+                            currentDepartmentId: req.body.departmentId
+                        }
+                    })
+                }
             }
         }
         if(!isValidOperation){
