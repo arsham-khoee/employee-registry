@@ -26,10 +26,10 @@ export async function signupAction(req, res) {
                 email: req.body.email
             }
         })
-        if(user.password){
-            return res.status(400).json({ message: 'you have already registered' })
-        }
         if(user) {
+            if(user.password){
+                return res.status(400).json({ message: 'you have already registered' })
+            }
             const updatedUser = await prisma.employee.update({
                 where:{
                     id: user.id
@@ -201,7 +201,16 @@ export async function employeeGetChangesHistoryAction(req, res) {
         const changesHistory = await prisma.changesHistory.findMany({
             where: {
                 assigneeId: req.params.id
+            },
+            include: {
+                assignor: true,
+                previousDepartment: true,
+                currentDepartment: true
             }
+        })
+        changesHistory.forEach(history => {
+            delete history.assignor['password']
+            delete history['assigneeId']
         })
         res.status(200).json(changesHistory)
     } catch(e) {
@@ -287,7 +296,10 @@ export async function employeeUpdateAction(req, res) {
             where: {
                 id: req.params.id
             },
-            data: req.body
+            data: req.body,
+            include: {
+                department: true,
+            }
         })
         delete updatedUser['password']
         res.status(200).json(updatedUser)

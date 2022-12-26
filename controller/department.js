@@ -92,10 +92,7 @@ export async function departmentUpdateAction(req, res) {
             where: {
                 id: req.params.id
             },
-            data: req.body,
-            include: {
-                department: true
-            }
+            data: req.body
         })
         res.status(200).json(updatedDepartment)
     } catch(e) {
