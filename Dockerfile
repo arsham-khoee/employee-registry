@@ -16,4 +16,6 @@ RUN npx prisma db pull
 
 RUN npx prisma generate
 
+#RUN npx prisma db push
+
 CMD [ "yarn", "start" ]
