@@ -58,9 +58,6 @@ export async function departmentGetByIdAction(req, res) {
         const department = await prisma.department.findUnique({
             where: {
                 id: req.params.id
-            },
-            include: {
-                employee: true
             }
         })
         if(!department) {
@@ -95,7 +92,10 @@ export async function departmentUpdateAction(req, res) {
             where: {
                 id: req.params.id
             },
-            data: req.body
+            data: req.body,
+            include: {
+                department: true
+            }
         })
         res.status(200).json(updatedDepartment)
     } catch(e) {

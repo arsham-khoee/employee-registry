@@ -26,6 +26,9 @@ export async function signupAction(req, res) {
                 email: req.body.email
             }
         })
+        if(user.password){
+            return res.status(400).json({ message: 'you have already registered' })
+        }
         if(user) {
             const updatedUser = await prisma.employee.update({
                 where:{
@@ -120,10 +123,13 @@ export async function employeePostAction(req, res) {
             return res.status(403).json({ message: 'no permission' })
         }
         req.body.forEach(async (obj) => {
+            const updates = Object.keys(obj)
+            if(updates.includes('password')){
+                return res.status(400).json({ message: 'you are not allowed to set password for others' })
+            }
             const employee = await prisma.employee.create({
                 data: obj
             })
-            const updates = Object.keys(obj)
             if(updates.includes('departmentId')) {
                 console.log(req.user)
                 // increase the current department employeeCount
@@ -152,7 +158,7 @@ export async function employeePostAction(req, res) {
                 })
             }
         })
-        res.status(201).json(employee)
+        res.status(201).json()
     } catch(e) {
         res.status(500).json({ message: e.message })
     }
