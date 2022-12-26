@@ -122,6 +122,26 @@ export async function departmentDeleteAction(req, res) {
                 departmentId: null
             }
         })
+        const employeeChanges = await prisma.changesHistory.findFirst({
+            where: {
+                OR: [{
+                    previousDepartmentId: department.id
+                },{
+                    currentDepartmentId: department.id
+                }]
+            }
+        })
+        if(employeeChanges){
+            const deletedChangesHistory = await prisma.changesHistory.deleteMany({
+                where: {
+                    OR: [{
+                        previousDepartmentId: department.id
+                    },{
+                        currentDepartmentId: department.id
+                    }]
+                }
+            })
+        }
         const deletedDepartment = await prisma.department.delete({
             where: {
                 id: req.params.id

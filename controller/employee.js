@@ -322,11 +322,44 @@ export async function employeeDeleteAction(req, res) {
         if(!employee) {
             return res.status(404).json({ message: 'no such employee found' })
         }
+        const employeeChanges = await prisma.changesHistory.findFirst({
+            where: {
+                OR: [{
+                    assigneeId: employee.id
+                },{
+                    assignorId: employee.id
+                }]
+            }
+        })
+        if(employeeChanges){
+            const deletedChangesHistory = await prisma.changesHistory.deleteMany({
+                where: {
+                    OR: [{
+                        assigneeId: employee.id
+                    },{
+                        assignorId: employee.id
+                    }]
+                }
+            })
+        }
         const deletedEmployee = await prisma.employee.delete({
             where: {
                 id: req.params.id
+            },
+            include: {
+                department: true
             }
         })
+        if(deletedEmployee.departmentId){
+            const updatedDepartment = await prisma.department.update({
+                where: {
+                    id: deletedEmployee.departmentId
+                },
+                data: {
+                    employeeCount: deletedEmployee.department.employeeCount - 1
+                }
+            })
+        }
         delete deletedEmployee['password']
         res.status(200).json(deletedEmployee)
     } catch(e) {
